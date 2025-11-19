@@ -1,9 +1,16 @@
 import React from 'react';
 import Form from 'react-bootstrap/Form';
-import { Inertia } from '@inertiajs/inertia'
-import { useDispatch } from "react-redux";
-import { ButtonGroup, Button } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { Inertia } from '@inertiajs/inertia';
+import { useDispatch } from 'react-redux';
+import { Button } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
+
+const closeActiveOffcanvas = () => {
+    const closeButton = document.querySelector('.offcanvas.show .btn-close');
+    if (closeButton) {
+        closeButton.click();
+    }
+};
 
 export default function EnterMarks({csrf,teachers,subjects}) {
 
@@ -34,19 +41,17 @@ export default function EnterMarks({csrf,teachers,subjects}) {
         //console.log(values);
       }
 
-    const handleSubmit = async (event) => {
+      const handleSubmit = async (event) => {
         event.preventDefault();
-        document.getElementsByClassName("btn-close")[0].click();
-    Inertia.post('/addMarks', values,{onSuccess: (resp) => {
-console.log( res.props.data);
-dispatch({
-    type: "updatedStudents",payload:res.props.data
-  });
+        Inertia.post('/addMarks', values,{onSuccess: (resp) => {
+  closeActiveOffcanvas();
+  console.log( resp.props.data);
+  dispatch({
+      type: "updatedStudents",payload:resp.props.data
+    });
 
-    }})
-        
-      
-    }
+      }})
+      }
     return (
        <>
        <h2>Enter Marks</h2>

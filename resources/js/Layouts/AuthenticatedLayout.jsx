@@ -7,6 +7,8 @@ import { Link } from '@inertiajs/inertia-react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 export default function Authenticated({ auth, header, children }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+    const avatarUrl = auth?.user?.profile_photo_url;
+    const avatarFallback = (auth?.user?.name || '?').charAt(0);
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -26,11 +28,20 @@ export default function Authenticated({ auth, header, children }) {
                                 <Dropdown>
                                     <Dropdown.Trigger>
                                         <span className="inline-flex rounded-md">
-                                            <button
-                                                type="button"
-                                                className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150"
-                                            >
-                                                {auth.user.name}
+                                              <button
+                                                  type="button"
+                                                  className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150"
+                                              >
+                                                  <span className="inline-flex items-center mr-2">
+                                                      {avatarUrl ? (
+                                                          <img src={avatarUrl} alt="Profile" className="h-8 w-8 rounded-full object-cover" />
+                                                      ) : (
+                                                          <span className="h-8 w-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center">
+                                                              {avatarFallback}
+                                                          </span>
+                                                      )}
+                                                  </span>
+                                                  {auth.user.name}
 
                                                 <svg
                                                     className="ml-2 -mr-0.5 h-4 w-4"
@@ -48,7 +59,10 @@ export default function Authenticated({ auth, header, children }) {
                                         </span>
                                     </Dropdown.Trigger>
 
-                                    <Dropdown.Content>
+                                      <Dropdown.Content>
+                                          <Dropdown.Link href={route('profile.edit')}>
+                                              Profile
+                                          </Dropdown.Link>
                                         <Dropdown.Link href={route('logout')} method="post" as="button">
                                             Log Out
                                         </Dropdown.Link>
@@ -88,15 +102,18 @@ export default function Authenticated({ auth, header, children }) {
                         <ResponsiveNavLink href={route('dashboard')} active={route().current('dashboard')}>
                             Dashboard
                         </ResponsiveNavLink>
-                        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded">
+                          <ResponsiveNavLink href={route('profile.edit')} active={route().current('profile.edit')}>
+                              Profile
+                          </ResponsiveNavLink>
+                          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded">
 
                                     Add Student
                             </button>
-                            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                              <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
  
                                     Add Teacher
                                 </button>
-                                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                  <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
 
                                     Add Subject
                                 </button>

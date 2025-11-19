@@ -18,12 +18,13 @@ return new class extends Migration
 
         Schema::dropIfExists('students');
         Schema::create('students', function (Blueprint $table) {
-            $table->bigIncrements("id");
+            $table->bigIncrements('id');
+            $table->string('nis')->unique();
             $table->string('name');
-            $table->enum('gender',['Male','Female'])->default('Male');
-            $table->integer('age');
-            $table->unsignedBigInteger('teacher_id')->unsigned()->nullable();
-            $table->foreign('teacher_id')->references('id')->on('teachers')->onDelete('cascade');
+            $table->enum('gender', ['Male', 'Female'])->default('Male');
+            $table->unsignedTinyInteger('age');
+            $table->foreignId('lembaga_id')->constrained('lembagas')->restrictOnDelete();
+            $table->foreignId('teacher_id')->nullable()->constrained('teachers')->nullOnDelete();
             $table->timestamps();
         });
     }

@@ -24,6 +24,9 @@
     "dependencies": {
         "@reduxjs/toolkit": "^1.8.5",
         "bootstrap": "^5.2.1",
+        "datatables.net": "^2.3.5",
+        "datatables.net-dt": "^2.3.5",
+        "jquery": "^3.7.1",
         "react-bootstrap": "^2.5.0",
         "react-redux": "^8.0.2",
         "redux": "^4.2.0"

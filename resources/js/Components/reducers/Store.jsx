@@ -1,4 +1,4 @@
-const Store = (state = {students:[],teachers:[],subjects:[],marks:[]}, action) => {
+const Store = (state = {students:[],teachers:[],subjects:[],marks:[],lembagas:[]}, action) => {
     switch(action.type){
         case "updatedStudents":
             return {
@@ -20,6 +20,11 @@ const Store = (state = {students:[],teachers:[],subjects:[],marks:[]}, action) =
                 return {
                     ...state,
                     marks: action.payload,
+                };
+            case "updatedLembagas":
+                return {
+                    ...state,
+                    lembagas: action.payload,
                 };
                 
         default:

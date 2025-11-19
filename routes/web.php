@@ -1,9 +1,11 @@
 <?php
 
 
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentController;
-use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\TeacherController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -28,16 +30,24 @@ Route::get('/', function () {
     ]);
 });
 
-Route::post('addStudent', [StudentController::class,'create']);
-Route::post('editStudent', [StudentController::class,'update']);
-Route::post('editMark', [StudentController::class,'editMark']);
-Route::post('deleteStudent', [StudentController::class,'destroy']);
-Route::post('deleteMarks', [StudentController::class,'deleteMarks']);
-Route::post('addMarks', [StudentController::class,'addMark']);
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'render'])->name('dashboard');
 
-Route::post('addTeacher', [TeacherController::class,'create']);
-Route::post('addSubject', [SubjectController::class,'create']);
+    Route::post('addStudent', [StudentController::class,'store']);
+    Route::post('editStudent', [StudentController::class,'update']);
+    Route::post('editMark', [StudentController::class,'editMark']);
+    Route::post('deleteStudent', [StudentController::class,'destroy']);
+    Route::post('deleteMarks', [StudentController::class,'deleteMarks']);
+    Route::post('addMarks', [StudentController::class,'addMark']);
+    Route::get('students/export', [StudentController::class,'export'])->name('students.export');
 
-Route::get('/dashboard', 'App\Http\Controllers\DashboardController@render')->middleware(['auth', 'verified'])->name('dashboard');
+    Route::post('addTeacher', [TeacherController::class,'create']);
+    Route::post('addSubject', [SubjectController::class,'create']);
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class,'edit'])->name('profile.edit');
+    Route::post('/profile', [ProfileController::class,'update'])->name('profile.update');
+});
 
 require __DIR__.'/auth.php';

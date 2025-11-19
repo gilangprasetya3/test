@@ -1,11 +1,18 @@
 import React from 'react';
 import Form from 'react-bootstrap/Form';
-import { Inertia } from '@inertiajs/inertia'
+import { Inertia } from '@inertiajs/inertia';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
-import { ButtonGroup, Button } from "react-bootstrap";
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { Button } from 'react-bootstrap';
+
+const closeActiveOffcanvas = () => {
+    const closeButton = document.querySelector('.offcanvas.show .btn-close');
+    if (closeButton) {
+        closeButton.click();
+    }
+};
 export default function MarkList({csrf,studentdata,teacherdata,subjectdata,marklist}) {
  
     const dispatch = useDispatch();
@@ -55,11 +62,10 @@ function handleShow(mark)  {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        document.getElementsByClassName("btn-close")[0].click();
-    Inertia.post('/editMark', values,{onSuccess: (resp) => {
-
+      Inertia.post('/editMark', values,{onSuccess: (resp) => {
+closeActiveOffcanvas();
 dispatch({
-    type: "updatedStudents",payload:res.props.data
+    type: "updatedStudents",payload:resp.props.data
   });
 
     }})
@@ -70,9 +76,8 @@ dispatch({
         event.preventDefault();
        
         Inertia.post('/deleteMarks',{id:mark[0].student_id,term:mark[0].term},{onSuccess: (resp) => {
-            console.log( res.props.data);
             dispatch({
-                type: "updatedStudents",payload:res.props.data
+                type: "updatedStudents",payload:resp.props.data
               });
             
                 }})

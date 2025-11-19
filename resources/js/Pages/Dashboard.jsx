@@ -97,7 +97,7 @@ View Student Lists
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div style={{display:showStudentslist}} ref={scrollto} className="marklist">
-                        <StudentList marklist={props.marklist} subjectdata={props.subjects}  teacherdata={props.teachers} studentdata={props.data}/>
+                          <StudentList csrf={props.csrf_token} lembagaOptions={props.lembagas} marklist={props.marklist} subjectdata={props.subjects}  teacherdata={props.teachers} studentdata={props.data}/>
 
                         </div>
 
@@ -113,7 +113,7 @@ View Student Lists
           <Offcanvas.Title></Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
-       <AddStudent csrf={props.csrf_token} teachers={props.teachers} />
+         <AddStudent csrf={props.csrf_token} teachers={props.teachers} lembagas={props.lembagas} />
        
         </Offcanvas.Body>
       </Offcanvas>
