@@ -1,8 +1,15 @@
 import React from 'react';
 import Form from 'react-bootstrap/Form';
-import { Inertia } from '@inertiajs/inertia'
-import { useDispatch } from "react-redux";
-import { ButtonGroup, Button } from "react-bootstrap";
+import { Inertia } from '@inertiajs/inertia';
+import { useDispatch } from 'react-redux';
+import { Button } from 'react-bootstrap';
+
+const closeActiveOffcanvas = () => {
+    const closeButton = document.querySelector('.offcanvas.show .btn-close');
+    if (closeButton) {
+        closeButton.click();
+    }
+};
 export default function AddTeacher({csrf}) {
 
     const dispatch = useDispatch();
@@ -24,19 +31,17 @@ export default function AddTeacher({csrf}) {
         }))
       }
 
-    const handleSubmit = async (event) => {
+      const handleSubmit = async (event) => {
         event.preventDefault();
-        document.getElementsByClassName("btn-close")[0].click();
-    Inertia.post('/addTeacher', values,{onSuccess: (resp) => {
-console.log( res.props.data);
-dispatch({
-    type: "updatedStudents",payload:res.props.data
-  });
-
-    }})
-        
-      
-    }
+    Inertia.post('/addTeacher', values,{
+        onSuccess: (resp) => {
+            closeActiveOffcanvas();
+            dispatch({
+                type: "updatedTeachers",payload:resp.props.teachers ?? resp.props.data ?? [],
+              });
+        }
+    })
+      }
     return (
        <>
        <h2>Add a teacher</h2>

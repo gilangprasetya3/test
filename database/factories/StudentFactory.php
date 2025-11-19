@@ -16,8 +16,15 @@ class StudentFactory extends Factory
      */
     public function definition()
     {
+        $gender = $this->faker->randomElement(['Male', 'Female']);
+
         return [
-            //
+            'nis' => strtoupper($this->faker->unique()->bothify('NIS-####')),
+            'name' => $this->faker->name($gender === 'Male' ? 'male' : 'female'),
+            'gender' => $gender,
+            'age' => $this->faker->numberBetween(7, 18),
+            'lembaga_id' => \App\Models\Lembaga::factory(),
+            'teacher_id' => null,
         ];
     }
 }

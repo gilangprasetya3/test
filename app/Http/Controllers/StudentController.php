@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\StudentsExport;
 use App\Models\Student;
 use App\Http\Requests\StoreStudentRequest;
+use App\Http\Requests\UpdateStudentRequest;
 use App\Models\Mark;
 use App\Models\Subject;
 use Illuminate\Http\Request;
-use App\Models\Teacher;
 use Illuminate\Support\Facades\Redirect;
+use Maatwebsite\Excel\Facades\Excel;
 class StudentController extends Controller
 {
 
@@ -29,42 +31,19 @@ class StudentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
-    {
-        
-        $student=new Student;
-        $student->name=$request->name;
-
-        $student->gender=$request->gender;
-        $student->age=$request->age;
-        $teacher = Teacher::find($request->reporting_teacher);
-        $student->teacher()->associate($teacher); 
-
-        if ($student->save()) {
-           
-            $students=Student::all();
-
-            return Redirect::back()->with([
-                'data' =>$students,
-            ]);
-
-        } else {
-            return Redirect::route('dashboard');
-        }
-
-
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreStudentRequest  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(StoreStudentRequest $request)
     {
-        //
+        $payload = $request->validated();
+
+        $student = Student::create($payload);
+
+        if ($student) {
+            return $this->redirectWithStudents('Student created successfully.');
+        }
+
+        return Redirect::route('dashboard')->withErrors(['student' => 'Unable to add student.']);
     }
+
     /**
      * Add marks to students.
      *
@@ -74,7 +53,7 @@ class StudentController extends Controller
     public function addMark(Request $request)
     {
        $subjects=$request->except(['student','term']);
-       $student=Student::find($request->student);
+       $student=Student::findOrFail($request->student);
        $isexist=$student->marks()->where('term',$request->term)->get();
 
        if (!empty($isexist)) {
@@ -98,11 +77,7 @@ class StudentController extends Controller
        }
 
 
-       $students=Student::all();
-
-       return Redirect::back()->with([
-           'data' =>$students,
-       ]);
+       return $this->redirectWithStudents('Marks saved successfully.');
 
     }
 
@@ -114,7 +89,7 @@ class StudentController extends Controller
     public function editMark(Request $request)
     {
        $subjects=$request->except(['student','term']);
-       $student=Student::find($request->student);
+       $student=Student::findOrFail($request->student);
        $isexist=$student->marks()->where('term',$request->term)->get();
 
        if (!empty($isexist)) {
@@ -142,11 +117,7 @@ class StudentController extends Controller
        }
 
 
-       $students=Student::all();
-
-       return Redirect::back()->with([
-           'data' =>$students,
-       ]);
+       return $this->redirectWithStudents('Marks updated successfully.');
 
     }
 
@@ -179,28 +150,13 @@ class StudentController extends Controller
      * @param  \App\Models\Student  $student
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request)
+    public function update(UpdateStudentRequest $request)
     {
-        $student= Student::find($request->id);
-        $student->name=$request->name;
+        $student = Student::findOrFail($request->validated('id'));
 
-        $student->gender=$request->gender;
-        $student->age=$request->age;
-        $teacher = Teacher::find($request->teacher_id);
-        $student->teacher()->associate($teacher); 
+        $student->update($request->validated());
 
-        if ($student->save()) {
-           
-            $students=Student::all();
-
-            return Redirect::back()->with([
-                'data' =>$students,
-            ]);
-
-        } else {
-            return Redirect::route('dashboard');
-        }
-
+        return $this->redirectWithStudents('Student updated successfully.');
     }
 
     /**
@@ -212,18 +168,13 @@ class StudentController extends Controller
     public function destroy(Request $request)
     {
        
-        if (Student::find($request->id)->delete()) {
-           
-            $students=Student::all();
+        $student = Student::findOrFail($request->id);
 
-            return Redirect::back()->with([
-                'data' =>$students,
-            ]);
+        if ($student->delete()) {
+            return $this->redirectWithStudents('Student deleted successfully.');
+        }
 
-        }
-        else {
-            return Redirect::route('dashboard');
-        }
+        return Redirect::route('dashboard')->withErrors(['student' => 'Unable to delete student.']);
     }
 
   /**
@@ -233,9 +184,33 @@ class StudentController extends Controller
 
     public function deleteMarks(Request $request)
     {
-        $student=Student::find($request->id);
+        $student=Student::findOrFail($request->id);
        
          $student->marks()->where('term',$request->term)->delete();
         
+         return $this->redirectWithStudents('Marks removed successfully.');
+    }
+
+    protected function redirectWithStudents(string $message = null)
+    {
+        $students = Student::with(['teacher', 'lembaga'])->orderByDesc('created_at')->get();
+
+        $payload = [
+            'data' => $students,
+        ];
+
+        if ($message) {
+            $payload['success'] = $message;
+        }
+
+        return Redirect::back()->with($payload);
+    }
+
+    public function export(Request $request)
+    {
+        $filters = $request->only(['nis', 'name', 'lembaga_id']);
+        $fileName = 'students-export-'.now()->format('Y_m_d_His').'.xlsx';
+
+        return Excel::download(new StudentsExport($filters), $fileName);
     }
 }

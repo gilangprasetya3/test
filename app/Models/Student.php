@@ -4,12 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
 use App\Models\Mark;
 use App\Models\Teacher;
+use App\Models\Lembaga;
 class Student extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'nis',
+        'name',
+        'gender',
+        'age',
+        'lembaga_id',
+        'teacher_id',
+    ];
 
     protected $appends = ['teacher_name','total_marks_term_one','total_marks_term_two'];
 
@@ -37,6 +46,11 @@ class Student extends Model
     public function teacher()
     {
     return $this->belongsTo(Teacher::class);
+    }
+
+    public function lembaga()
+    {
+        return $this->belongsTo(Lembaga::class);
     }
 
 }
