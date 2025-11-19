@@ -21,7 +21,7 @@ class StudentsExport implements FromCollection, WithHeadings, WithMapping, Shoul
      */
     public function __construct(array $filters = [])
     {
-        $this->filters = Arr::only($filters, ['nis', 'name', 'lembaga_id']);
+        $this->filters = Arr::only($filters, ['nis', 'name', 'lembaga_id', 'teacher_id']);
     }
 
     public function collection()
@@ -38,6 +38,10 @@ class StudentsExport implements FromCollection, WithHeadings, WithMapping, Shoul
 
         if (!empty($this->filters['lembaga_id'])) {
             $query->where('lembaga_id', $this->filters['lembaga_id']);
+        }
+
+        if (!empty($this->filters['teacher_id'])) {
+            $query->where('teacher_id', $this->filters['teacher_id']);
         }
 
         return $query->get();

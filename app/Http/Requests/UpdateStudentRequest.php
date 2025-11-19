@@ -38,4 +38,13 @@ class UpdateStudentRequest extends FormRequest
             'teacher_id' => ['nullable', 'exists:teachers,id'],
         ];
     }
+
+    protected function prepareForValidation(): void
+    {
+        $studentId = $this->route('student')?->id ?? $this->route('id');
+
+        if ($studentId && !$this->has('id')) {
+            $this->merge(['id' => $studentId]);
+        }
+    }
 }
